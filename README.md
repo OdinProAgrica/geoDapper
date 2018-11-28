@@ -31,7 +31,7 @@ then restart HPCC:
 Once this is done, everything should work. Just add the PolygonTools.ecl file to your ECL repo and you're good to go. 
 
 ## Common errors
-If you get something along the lines of "cannot find library -lpy3plugin" then either the plugin or the config file is broken.
+If you get something along the lines of "cannot find library -lpy3embed" then either the plugin or the config file is broken.
 
 # How this works
 So there are two kinds of functions in geodapper.polygontools:
