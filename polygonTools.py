@@ -3,32 +3,9 @@
 # https://hpccsystems.com/bb/viewtopic.php?f=23&t=5243
 # https://hpccsystems.com/blog/embedding-tensorflow-operations-ecl
 # https://hpccsystems.com/bb/viewtopic.php?f=41&t=1509
-
-
-## Sort out dependencies ##
-import pip
-
-if hasattr(pip, "main"):
-  installer = pip.main
-else:
-  installer = pip._internal.main
   
-try:
-  import shapely
-except ImportError:
-  installer(["install", "shapely"])
-  import shapely
-  
-try:
-  import pyproj
-except ImportError:
-  installer(["install", "pyproj"])
-  import pyproj  
-#########################
-  
-  
-# import pyproj 
-# import shapely
+import pyproj 
+import shapely
 from shapely import wkt, ops
 from itertools import combinations
 import warnings
