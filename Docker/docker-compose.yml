@@ -1,0 +1,9 @@
+version: '2'
+services:
+  hpccgeodapper:
+    build:
+        context: ./../
+        dockerfile: ./Docker/Dockerfile
+    ports:
+      - "8010:8010"
+      - "8015:8015"
