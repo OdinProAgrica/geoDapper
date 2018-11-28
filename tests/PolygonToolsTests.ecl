@@ -31,8 +31,6 @@ pt.polys_arein(tt.select(geoSet, 'uid, polygon, polygon2'));
 pt.project_polygons(tt.select(geoSet, 'uid, polygon'), 'epsg:4326');
 pt.polys_intersect(tt.select(geoSet, 'uid, polygon, polygon2'));
 
-
-
 // tests for SET OF STRINGS in DATASETS  
 addSet := PROJECT(geoSet, TRANSFORM({STRING uid; STRING polygon; SET OF STRING polygons;}, SELF.polygons := [LEFT.polygon]; SELF := LEFT;));
 
@@ -50,3 +48,4 @@ pt.overlap_polygons(mergedData);
 
 
 
+  
