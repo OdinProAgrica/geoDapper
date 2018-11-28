@@ -1,3 +1,5 @@
+![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/geodapperLogo.png)
+
 # geodapper
 Polygon handling tools for ECL!
 
