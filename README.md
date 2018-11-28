@@ -1,11 +1,11 @@
-![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/geodapperLogo.png)
-
 # geodapper
 Polygon handling tools for ECL!
 
 This project is still under development. It implements Python's Shapely functions to handle working with WKT polygons. 
 
 Contributions welcome. 
+
+![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/geodapperLogo.png)
 
 # Installation
 There is a shell script (installPython.sh) which works fine on an Ubuntu Xenial 64-bit docker container. It will do *some* of the setup for you but it will need to be adapted to your system. You can also check out the Dockerfile we use for dev and testing which goes through all the required steps. 
