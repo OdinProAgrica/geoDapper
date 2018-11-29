@@ -22,7 +22,6 @@ def _convert_wkt(poly):
 
 
 ## Single Line Functions ##
-
 def poly_area(poly):
   try:
     poly = _convert_wkt(poly)
@@ -141,7 +140,7 @@ def poly_union(in_polys, tol=0.000001):
       combined = combined.union(new)
     except Exception as e:
       warnings.warn("combining {} and {} failed".format(combined.wkt, new.wkt))
-      return "Invalid Merged Geometry"
+      return ""
               
     if not combined.is_valid:
       # then check the one we make is valid
@@ -231,6 +230,9 @@ def overlap_polygons(recs):
     
 def polys_intersect(recs):
   """
+  Failures will be silently dropped from the merge. Test 
+  with polys_is_valid first! 
+  
   Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
   Returns an ECL dataset {STRING uid; BOOLEAN intersects;}
   """
