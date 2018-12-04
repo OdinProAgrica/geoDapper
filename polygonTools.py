@@ -10,9 +10,18 @@ from shapely import wkt, ops
 import warnings
 import itertools
 from functools import wraps
+import traceback
 
 
 # Internal Functions #
+def _fail_as(fail_as):
+    def wrapper(f):
+        @wraps(f)
+        def func_wrapper(*args, **kwargs):
+            return _fail_nicely(f, fail_as, args, kwargs)
+        return func_wrapper
+    return wrapper
+
 # TODO test
 def _convert_wkt(poly):
     if isinstance(poly, str):
@@ -25,16 +34,12 @@ def _fail_nicely(f, to_return, args, kwargs):
     try:
         return f(*args, **kwargs)
     except Exception:
+        tb = traceback.format_exc()
+        warnings.warn(tb)
         return to_return
 
 
-def _fail_as(fail_as):
-    def wrapper(f):
-        @wraps(f)
-        def func_wrapper(*args, **kwargs):
-            return _fail_nicely(f, fail_as, args, kwargs)
-        return func_wrapper
-    return wrapper
+
 
 #########################
 
@@ -114,12 +119,21 @@ def overlap_polygon(in_polys):
 
 @_fail_as("")
 def combine_polygons(poly_1, poly_2, tol=0.000001):
-    p1 = _convert_wkt(poly_1)
-    p2 = _convert_wkt(poly_2)
-    if not p1.is_valid:
-        p1 = p1.simplify(tol)
-    if not p2.is_valid:
-        p2 = p2.simplify(tol)
+    try:
+        p1 = _convert_wkt(poly_1)
+    except shapely.errors.WKTReadingError:
+
+        p1 = shapely.geometry.Polygon()
+    else:
+        if not p1.is_valid:
+            p1 = p1.simplify(tol)
+    try:
+        p2 = _convert_wkt(poly_2)
+    except shapely.errors.WKTReadingError:
+        p2 = shapely.geometry.Polygon()
+    else:
+        if not p2.is_valid:
+            p2 = p2.simplify(tol)
 
     assert p1.is_valid
     assert p2.is_valid
@@ -140,53 +154,27 @@ def combine_polygons(poly_1, poly_2, tol=0.000001):
 # todo test
 @_fail_as("")
 def poly_union(in_polys, tol=0.000001):
-  """
-  Union a list of polygons. Drops invalid polygons at read in
-  so CHECK THIS FIRST! `poly_isvalid` will help you here.
+    """
+    Union a list of polygons. Drops invalid polygons at read in
+    so CHECK THIS FIRST! `poly_isvalid` will help you here.
 
-  Parameters
-  ----------
-  in_polys: list
-    polygons to merge in WKT format.
-  tol: float
+    Parameters
+    ----------
+    in_polys: list
+        polygons to merge in WKT format.
+    tol: float
     tolerance to simplify polygons by in the case of an overlapping
     merge.
 
-  Returns
-  -------
-  type: string
-    String of the resulting WKT.
-  """
-  combined = shapely.geometry.Polygon()
-  polys = []
-  for poly in in_polys:
-    try:
-      polys.append(_convert_wkt(poly))
-    except shapely.errors.WKTReadingError:
-      warnings.warn("Dropping invalid polygon")
-      pass
-
-  for new in polys:
-  # first check the new one is valid
-    if not new.is_valid:
-      warnings.warn("{} is not a valid polygon".format(new.wkt))
-      continue
-    try:
-      combined = combined.union(new)
-    except shapely.errors.TopologicalError as e:
-      warnings.warn("TopologicalError was raised, trying to simplify both polygons.")
-      combined = combined.simplify(tol)
-      new = new.simplify(tol)
-      combined = combined.union(new)
-    except Exception as e:
-      warnings.warn("combining {} and {} failed".format(combined.wkt, new.wkt))
-      return ""
-
-    if not combined.is_valid:
-      # then check the one we make is valid
-      warnings.warn("An invalid polygon was created. Simplification has taken place.")
-      combined = combined.simplify(tol)
-  return str(combined)
+    Returns
+    -------
+    type: string
+        String of the resulting WKT.
+    """
+    combined = shapely.geometry.Polygon().wkt
+    for new in in_polys:
+        combined = combine_polygons(combined, new, tol) or combined
+    return combined
   
 ###########################################################
 
