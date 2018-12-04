@@ -19,6 +19,6 @@ dpkg -i hpccsystems-plugin-py3embed_6.4.24-1xenial_amd64.deb
 apt-get install -f
 
 # Download polygon tools python script from our repo so it's callable
-wget https://raw.githubusercontent.com/OdinProAgrica/geodapper/master/polygonTools.py -P /opt/HPCCSystems/scripts
-chown hpcc /opt/HPCCSystems/scripts/polygonTools.py
-chgrp hpcc /opt/HPCCSystems/scripts/polygonTools.py
+wget https://raw.githubusercontent.com/OdinProAgrica/geodapper/master/polygonTools.py -P /opt/HPCCSystems/scripts/bin
+chown hpcc /opt/HPCCSystems/scripts/bin/polygonTools.py
+chgrp hpcc /opt/HPCCSystems/scripts/bin/polygonTools.py

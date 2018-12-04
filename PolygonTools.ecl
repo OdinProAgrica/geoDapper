@@ -12,8 +12,8 @@
 // AND PERSISTS. PERSISTS!!!!
 
 EXPORT PolygonTools := MODULE
-	SHARED module_location := '/opt/HPCCSystems/scripts/polygonTools.';
 	// SHARED module_location := './polygonTools.';
+	SHARED module_location := '/opt/HPCCSystems/scripts/bin/polygonTools.';
 
 	// Dataset Opearations /////////////////////////////////////////////////////////////
 	// These take in a whole dataset and return a whole dataset. More basic calls for //	
