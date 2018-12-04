@@ -1,4 +1,4 @@
-# geodapper
+# wally
 Polygon handling tools for ECL!
 
 This project is still under development. It implements Python's Shapely functions to handle working with WKT polygons. 
@@ -14,7 +14,7 @@ Here's a few pointers:
 
 * Updates linux package lists
 * installs the right python version (3, of course), pip and libpython3.5
-* pip installs pyproj and shapely which are needed by geodapper
+* pip installs pyproj and shapely which are needed by wally
 * Grabs the python3 plugin for HPCC 6.4.24-1 on Ubuntu Xenial 64-bit. This isn't insalled by default unless you have the with plugins version of HPCC. You can check for it (in this version at least) by seeing if \opt\HPCCSystems\versioned\python3\libpy3embed.so exists. If you have a different HPCC (or flavour of linux) then check the HPCC dowloads for the right plugin. 
 * Grabs the polygonTools.py file from this repo and deploys it to /opt/HPCCSystems/scripts/polygonTools.py you may change this but you'll also need to update the SHARED module_location definition in polygonTools.ecl to reflect this. 
 
@@ -34,7 +34,7 @@ Once this is done, everything should work. Just add the PolygonTools.ecl file to
 If you get something along the lines of "cannot find library -lpy3embed" then either the plugin or the config file is broken.
 
 # How this works
-So there are two kinds of functions in geodapper.polygontools:
+So there are two kinds of functions in wally.polygontools:
 
 ## By-value calculations
 These are singular statements such as wkt_isvalid(), poly_isin(), poly_union(). These take single values and return single values, making them useful in transforms or join conditions (although but as much logic as possible *before* the join condition to make it lighter weight!). 
