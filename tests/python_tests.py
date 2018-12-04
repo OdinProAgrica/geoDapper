@@ -166,11 +166,32 @@ class TestPolyUnion(TestCase):
         res = poly_union([self.valid])
         self.assertEqual(self.valid, res)
 
-    # only 1 p
-    # 2 p
-    # 3 p
-    # 2 of the same p
-    # bad p1
-    # bad p2
-    # bad p3
-    # no p
+    def test_poly_union_duplicate_p(self):
+        res = poly_union([self.valid] * 2)
+        self.assertEqual(self.valid, res)
+
+    def test_poly_union_no_p(self):
+        res = poly_union([])
+        self.assertEqual("GEOMETRYCOLLECTION EMPTY", res)
+
+    def test_poly_union_2_polys(self):
+        res = poly_union([self.valid, self.valid_2])
+        expected = "POLYGON ((0 0, 0 1, 0 2, 1 2, 1 1, 1 0, 0 0))"
+        self.assertEqual(expected, res)
+
+    def test_poly_union_2_poly_multipoly(self):
+        res = poly_union([self.valid, self.valid_3])
+        expected = ("MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)), "
+                    "((1 1, 1 2, 2 2, 2 1, 1 1)))")
+        self.assertEqual(expected, res)
+
+    def test_poly_union_3_polys(self):
+        res = poly_union([self.valid, self.valid_2, self.valid_3])
+        expected = "POLYGON ((0 0, 0 1, 0 2, 1 2, 2 2, 2 1, 1 1, 1 0, 0 0))"
+        self.assertEqual(expected, res)
+
+    def test_poly_union_bad_poly(self):
+        res = poly_union([self.valid, self.valid_3, self.invalid])
+        expected = ("MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)), "
+                    "((1 1, 1 2, 2 2, 2 1, 1 1)))")
+        self.assertEqual(expected, res)
