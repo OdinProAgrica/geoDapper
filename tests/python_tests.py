@@ -1,5 +1,6 @@
 from polygonTools import *
 from unittest import TestCase
+from collections import namedtuple
 
 
 class TestWktIsValid(TestCase):
@@ -287,3 +288,33 @@ class TestOverlapArea(TestCase):
         p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
         overlap = overlap_area([p1])
         self.assertEqual(overlap, 0.0)
+
+
+class TestWKTsAreValid(TestCase):
+    def setUp(self):
+        self.Rec = namedtuple("Rec", ["uid", "polygon"])
+
+    def test_wkts_are_valid_single_rec(self):
+        inp = [self.Rec(123, "POINT(1 1)")]
+        res = wkts_are_valid(inp)
+        for r in res:
+            self.assertEqual(r, (123, True))
+
+    def test_wkts_are_valid_multiple_valid(self):
+        inp = [self.Rec(123, "POINT(1 1)")] * 2
+        res = wkts_are_valid(inp)
+        for r in res:
+            self.assertEqual(r, (123, True))
+
+    def test_wkts_are_valid_multiple_invalid(self):
+        inp = [self.Rec(123, "MADEUP")] * 2
+        res = wkts_are_valid(inp)
+        for r in res:
+            self.assertEqual(r, (123, False))
+
+    def test_wkts_are_valid_mixed(self):
+        inp = [self.Rec(123, "MADEUP"), self.Rec(123, "POINT(1 1)")]
+        res = wkts_are_valid(inp)
+        vals = [False, True]
+        for r, v in zip(res, vals):
+            self.assertEqual(r, (123, v))

@@ -5,8 +5,9 @@
 # https://hpccsystems.com/bb/viewtopic.php?f=41&t=1509
   
 import pyproj 
-import shapely
 from shapely import wkt, ops
+from shapely.errors import TopologicalError
+from shapely.geometry import Polygon
 import warnings
 import itertools
 from functools import wraps
@@ -123,7 +124,7 @@ def combine_polygons(poly_1, poly_2, tol=0.000001):
 
     try:
         p = p1.union(p2)
-    except shapely.errors.TopologicalError:
+    except TopologicalError:
         p1 = p1.simplify(tol)
         p2 = p2.simplify(tol)
         p = combine_polygons(p1, p2, tol)
@@ -153,26 +154,25 @@ def poly_union(in_polys, tol=0.000001):
     type: string
         String of the resulting WKT.
     """
-    combined = shapely.geometry.Polygon().wkt
+    combined = Polygon().wkt
     for new in in_polys:
         combined = combine_polygons(combined, new, tol)
     return combined
   
 ###########################################################
 
+# Dataset Wide Functions #
 
 
-## Dataset Wide Functions ##
-# todo test
 def wkts_are_valid(recs):
-  """
-  Ensures your WKTs are valid 
+    """
+    Ensures your WKTs are valid
   
-  Takes an ECL dataset {STRING uid; STRING polygon;}
-  Returns an ECL dataset {STRING uid; BOOLEAN is_valid;}
-  """
-  for rec in recs:  
-    yield (rec.uid, wkt_isvalid(rec.polygon))
+    Takes an ECL dataset {STRING uid; STRING polygon;}
+    Returns an ECL dataset {STRING uid; BOOLEAN is_valid;}
+    """
+    for rec in recs:
+        yield (rec.uid, wkt_isvalid(rec.polygon))
         
         
 def polys_area(recs):  
