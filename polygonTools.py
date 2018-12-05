@@ -186,79 +186,79 @@ def polys_area(recs):
     for rec in recs:
         yield (rec.uid, poly_area(rec.polygon))
  
-#todo test
+
 def polys_arein(recs):
-  """
-  Failures will not be returned. Test with polys_are_valid
-  first! 
+    """
+    Failures will not be returned. Test with polys_are_valid
+    first!
 
-  Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
-  Returns an ECL dataset {STRING uid; BOOLEAN is_in;}
-  """
-  for rec in recs:
-    yield (rec.uid, poly_isin(rec.polygon, rec.polygon2))
+    Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
+    Returns an ECL dataset {STRING uid; BOOLEAN is_in;}
+    """
+    for rec in recs:
+        yield (rec.uid, poly_isin(rec.polygon, rec.polygon2))
 
-  # todo test
-def polys_union(recs, tol = 0.000001):      
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+
+def polys_union(recs, tol=0.000001):
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
-  Returns an ECL dataset {STRING uid; STRING polygon;}
-  """
+    Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
+    Returns an ECL dataset {STRING uid; STRING polygon;}
+    """
   
-  for rec in recs:
-    yield (rec.uid, poly_union(rec.polygons, tol))
+    for rec in recs:
+        yield (rec.uid, poly_union(rec.polygons, tol))
 
-  # todo test
+
 def overlap_areas(recs):      
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
-  Returns an ECL dataset {STRING uid; REAL overlap;}
-  """
+    Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
+    Returns an ECL dataset {STRING uid; REAL overlap;}
+    """
   
-  for rec in recs:
-    yield (rec.uid, overlap_area(rec.polygons))
+    for rec in recs:
+        yield (rec.uid, overlap_area(rec.polygons))
 
-    # todo test
+
 def overlap_polygons(recs):      
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
-  Returns an ECL dataset {STRING uid; STRING polygon;}
-  """
+    Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
+    Returns an ECL dataset {STRING uid; STRING polygon;}
+    """
   
-  for rec in recs:
-    yield (rec.uid, overlap_polygon(rec.polygons))
+    for rec in recs:
+        yield (rec.uid, overlap_polygon(rec.polygons))
 
-    # todo test
+
 def polys_intersect(recs):
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
-  Returns an ECL dataset {STRING uid; BOOLEAN intersects;}
-  """
-  for rec in recs:
-    yield(rec.uid, poly_intersect(rec.polygon, rec.polygon2))
+    Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
+    Returns an ECL dataset {STRING uid; BOOLEAN intersects;}
+    """
+    for rec in recs:
+        yield(rec.uid, poly_intersect(rec.polygon, rec.polygon2))
 
-  # todo test
+
 def project_polygons(recs, to_proj, from_proj="epsg:4326"):      
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; STRING polygon;}
-  Returns an ECL dataset {STRING uid; STRING polygon;}
-  """
+    Takes an ECL dataset {STRING uid; STRING polygon;}
+    Returns an ECL dataset {STRING uid; STRING polygon;}
+    """
   
-  for rec in recs:
-    yield (rec.uid, project_polygon(rec.polygon, to_proj, from_proj))
+    for rec in recs:
+        yield (rec.uid, project_polygon(rec.polygon, to_proj, from_proj))
 ###########################################################
