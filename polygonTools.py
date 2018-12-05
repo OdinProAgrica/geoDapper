@@ -119,21 +119,13 @@ def overlap_polygon(in_polys):
 
 @_fail_as("")
 def combine_polygons(poly_1, poly_2, tol=0.000001):
-    try:
-        p1 = _convert_wkt(poly_1)
-    except shapely.errors.WKTReadingError:
+    p1 = _convert_wkt(poly_1)
+    if not p1.is_valid:
+        p1 = p1.simplify(tol)
 
-        p1 = shapely.geometry.Polygon()
-    else:
-        if not p1.is_valid:
-            p1 = p1.simplify(tol)
-    try:
-        p2 = _convert_wkt(poly_2)
-    except shapely.errors.WKTReadingError:
-        p2 = shapely.geometry.Polygon()
-    else:
-        if not p2.is_valid:
-            p2 = p2.simplify(tol)
+    p2 = _convert_wkt(poly_2)
+    if not p2.is_valid:
+        p2 = p2.simplify(tol)
 
     assert p1.is_valid
     assert p2.is_valid
@@ -151,7 +143,6 @@ def combine_polygons(poly_1, poly_2, tol=0.000001):
     return p.wkt
 
 
-# todo test
 @_fail_as("")
 def poly_union(in_polys, tol=0.000001):
     """
@@ -173,7 +164,7 @@ def poly_union(in_polys, tol=0.000001):
     """
     combined = shapely.geometry.Polygon().wkt
     for new in in_polys:
-        combined = combine_polygons(combined, new, tol) or combined
+        combined = combine_polygons(combined, new, tol)
     return combined
   
 ###########################################################

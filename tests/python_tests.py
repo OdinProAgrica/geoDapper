@@ -128,11 +128,11 @@ class TestCombinePolygons(TestCase):
 
     def test_combine_polygons_fails_bad_p1(self):
         res = combine_polygons(self.invalid, self.valid)
-        self.assertEqual(self.valid, res)
+        self.assertEqual("", res)
 
     def test_combine_polygons_fails_bad_p2(self):
         res = combine_polygons(self.valid, self.invalid)
-        self.assertEqual(self.valid, res)
+        self.assertEqual("", res)
 
     def test_combine_polygons_returns_same_polygon(self):
         res = combine_polygons(self.valid, self.valid)
@@ -194,7 +194,7 @@ class TestPolyUnion(TestCase):
         res = poly_union([self.valid, self.valid_3, self.invalid])
         expected = ("MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)), "
                     "((1 1, 1 2, 2 2, 2 1, 1 1)))")
-        self.assertEqual(expected, res)
+        self.assertEqual("", res)
 
     def test_poly_union_non_iterable(self):
         res = poly_union(123)
