@@ -3,7 +3,7 @@
 // THIS MODULE EXPORTS PYTHON FUNCTIONS FOR HANDLING AREAS.
 // It requires that you have polygonTools.py installed in 
 // the correct place for each node, that the python3 
-// plugin is installed AND that you've updated  
+// plugin is installed AND that you've updated
 // /etc/HPCCSystems/environment.conf
 // to use python3 (additionalPlugins=python3) 
 
@@ -36,7 +36,7 @@ EXPORT PolygonTools := MODULE
   EXPORT areaOutRec := {STRING uid; REAL area;};
   EXPORT DATASET(areaOutRec) polys_area (DATASET(areaInRec) recs) := IMPORT(python3, module_location + 'polys_area');
 
-  // polys_arein - is one point/line/polygon within a polygon? 
+  // polys_arein - is one point/line/polygon within a polygon?
   //eg: polys_arein(containsIn)
   EXPORT containsInRec := {STRING uid; STRING polygon; STRING polygon2;};
   EXPORT containsOutRec := {STRING uid; BOOLEAN is_in;};
@@ -74,18 +74,19 @@ EXPORT PolygonTools := MODULE
 
 
 
-  // Transform Operations ///////////////////////////////////////////////////////////
-  // These operations can be applied as part of a transform, for example:          //
-  // SELF.area := poly_area(LEFT.polygon)                                          //
-  // This also means you could use them as part of a join condition:               //
-  // poly_isin(LEFT.poly, RIGHT.poly)                                              //
-  // but use with caution, the dataset wide operations are much more efficient.    //
-  // You definitely want to use other join conditions to slim down the number of   //
-  // python calls you have to make.                                                //
-  // WARNING: Failures due to faulty polygons my cause a no return on the output   //
-  // dataset. You should check your polygons with polys_are_Valid before           //
-  // any operations. Python in HPCC has a habit of failing silently.               //
-  ///////////////////////////////////////////////////////////////////////////////////
+	// Transform Opearations ///////////////////////////////////////////////////////////
+	// These operations can be appied as part of a transform, for example: //
+	// SELF.area := poly_area(LEFT.polygon) //
+	// This also means you could use them as part of a join condition: //
+	// poly_isin(LEFT.poly, RIGHT.poly) //
+	// but use with caution, the dataset wide operations are much more efficient. You //
+	// definately want to use other join conditions to slim down the number of python //
+	// calls you have to make. //
+	//
+	// WARNING: Failures due to faulty polygons my cause a no return on the output //
+	// dataset. You should check your polygons with polys_are_Valid before //
+	// any operations. Python in HPCC has a habit of failing silently. //
+	////////////////////////////////////////////////////////////////////////////////////
 
   //wkt_isvalid
   //eg: wkt_isvalid('POLYGON((40 40, 20 45, 45 30, 40 40))')
@@ -120,3 +121,8 @@ EXPORT PolygonTools := MODULE
   EXPORT STRING poly_union(SET OF STRING in_polys, REAL tol=0.000001) := IMPORT(python3, module_location + 'poly_union');
 
 END;
+
+
+
+
+

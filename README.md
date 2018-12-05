@@ -6,6 +6,9 @@ functions to handle working with WKT polygons.
 
 Contributions welcome. 
 
+![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/geodapperLogo.png)
+
+
 # Installation
 There is a shell script (installPython.sh) which works fine on an Ubuntu 
 Xenial 64-bit docker container. It will do *some* of the setup for you but it 
