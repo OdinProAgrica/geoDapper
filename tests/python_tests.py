@@ -318,3 +318,32 @@ class TestWKTsAreValid(TestCase):
         vals = [False, True]
         for r, v in zip(res, vals):
             self.assertEqual(r, (123, v))
+
+
+class TestPolysArea(TestCase):
+    def setUp(self):
+        self.Rec = namedtuple("Rec", ["uid", "polygon"])
+
+    def test_polys_area_single_rec_point(self):
+        inp = [self.Rec(123, "POINT(1 1)")]
+        res = polys_area(inp)
+        for r in res:
+            self.assertEqual(r, (123, 0.0))
+
+    def test_polys_area_single_rec_polygon(self):
+        inp = [self.Rec(123, "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))")]
+        res = polys_area(inp)
+        for r in res:
+            self.assertEqual(r, (123, 4.0))
+
+    def test_polys_area_two_rec_polygon(self):
+        inp = [self.Rec(123, "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))")] * 2
+        res = polys_area(inp)
+        for r in res:
+            self.assertEqual(r, (123, 4.0))
+
+    def test_polys_area_single_rec_invalid(self):
+        inp = [self.Rec(123, "MADEUP")]
+        res = polys_area(inp)
+        for r in res:
+            self.assertEqual(r, (123, 0.0))

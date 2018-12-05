@@ -173,18 +173,18 @@ def wkts_are_valid(recs):
     """
     for rec in recs:
         yield (rec.uid, wkt_isvalid(rec.polygon))
-        
-        
+
+
 def polys_area(recs):  
-  """
-  Failures will not be returned. Test with polys_is_valid
-  first! 
+    """
+    Failures will not be returned. Test with polys_is_valid
+    first!
   
-  Takes an ECL dataset {STRING uid; STRING polygon;}
-  Returns an ECL dataset {STRING uid; REAL area;}
-  """
-  for rec in recs:
-    yield (rec.uid, poly_area(rec.polygon))
+    Takes an ECL dataset {STRING uid; STRING polygon;}
+    Returns an ECL dataset {STRING uid; REAL area;}
+    """
+    for rec in recs:
+        yield (rec.uid, poly_area(rec.polygon))
  
 #todo test
 def polys_arein(recs):
