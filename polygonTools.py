@@ -88,16 +88,13 @@ def project_polygon(poly, to_proj, from_proj="epsg:4326"):
     return poly.wkt
 
 
-#todo test
+@_fail_as(0.0)
 def overlap_area(polys):
-  """
-  Remember to project!!!!
-  """
-  try: 
+    """
+    Remember to project!!!!
+    """
     union_poly = overlap_polygon(polys)
     return poly_area(union_poly)
-  except AttributeError:
-    return 0.0
 
 
 @_fail_as("")

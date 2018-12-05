@@ -243,3 +243,47 @@ class TestOverlapPolygons(TestCase):
         p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
         overlap = overlap_polygon([p1])
         self.assertEqual(overlap, "GEOMETRYCOLLECTION EMPTY")
+
+
+class TestOverlapArea(TestCase):
+    def test_overlap_area_with_no_overlap(self):
+        p1 = "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"
+        p2 = "POLYGON ((2 2, 2 3, 3 3, 3 2, 2 2))"
+        overlap = overlap_area([p1, p2])
+        self.assertEqual(overlap, 0.0)
+
+    def test_overlap_area_point_overlap(self):
+        p1 = "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        overlap = overlap_area([p1, p2])
+        self.assertEqual(overlap, 0.0)
+
+    def test_overlap_area_polygon_overlap(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        overlap = overlap_area([p1, p2])
+        self.assertEqual(overlap, 1.0)
+
+    def test_overlap_area_two_overlaps(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        p3 = "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"
+        overlap = overlap_area([p1, p2, p3])
+        self.assertEqual(2.0, overlap)
+
+    def test_overlap_area_duplicate_overlaps(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        overlap = overlap_area([p1, p2, p2])
+        self.assertEqual(overlap, 1.0)
+
+    def test_overlap_area_bad_polygon(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        overlap = overlap_area([p1, p2, "madeup"])
+        self.assertEqual(overlap, 0.0)
+
+    def test_overlap_area_single_polygon(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        overlap = overlap_area([p1])
+        self.assertEqual(overlap, 0.0)
