@@ -22,6 +22,7 @@ def _fail_as(fail_as):
         return func_wrapper
     return wrapper
 
+
 # TODO test
 def _convert_wkt(poly):
     if isinstance(poly, str):
@@ -38,13 +39,10 @@ def _fail_nicely(f, to_return, args, kwargs):
         warnings.warn(tb)
         return to_return
 
-
-
-
 #########################
-
-
 # Single Line Functions #
+
+
 @_fail_as(0.0)
 def poly_area(poly):
     poly = _convert_wkt(poly)
@@ -82,8 +80,10 @@ def project_polygon(poly, to_proj, from_proj="epsg:4326"):
     p1 = pyproj.Proj(init=from_proj)
     p2 = pyproj.Proj(init=to_proj)
 
-    t = lambda x, y: pyproj.transform(p1, p2, x, y)
-    poly = ops.transform(t, poly)
+    def trans(x, y):
+        return pyproj.transform(p1, p2, x, y)
+
+    poly = ops.transform(trans, poly)
   
     return poly.wkt
 
@@ -100,21 +100,15 @@ def overlap_area(polys):
     return 0.0
 
 
-# todo test
+@_fail_as("")
 def overlap_polygon(in_polys):
-  polys = []
-  for poly in in_polys:
-    try:
-      polys.append(_convert_wkt(poly))
-    except shapely.errors.WKTReadingError:
-      warnings.warn("Dropping invalid polygon")
-      pass
-      
-  combinations = itertools.combinations(polys, 2)
-  overlaps = [a.intersection(b) for a,b in combinations]
+    polys = (_convert_wkt(poly) for poly in in_polys)
+
+    combinations = itertools.combinations(polys, 2)
+    overlaps = [a.intersection(b) for a, b in combinations]
   
-  unioned_overlaps = poly_union(overlaps)
-  return str(unioned_overlaps)
+    unioned_overlaps = poly_union(overlaps)
+    return unioned_overlaps
 
 
 @_fail_as("")

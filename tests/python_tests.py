@@ -192,10 +192,54 @@ class TestPolyUnion(TestCase):
 
     def test_poly_union_bad_poly(self):
         res = poly_union([self.valid, self.valid_3, self.invalid])
-        expected = ("MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)), "
-                    "((1 1, 1 2, 2 2, 2 1, 1 1)))")
         self.assertEqual("", res)
 
     def test_poly_union_non_iterable(self):
         res = poly_union(123)
         self.assertEqual("", res)
+
+
+class TestOverlapPolygons(TestCase):
+    def test_overlap_polygons_with_no_overlap(self):
+        p1 = "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"
+        p2 = "POLYGON ((2 2, 2 3, 3 3, 3 2, 2 2))"
+        overlap = overlap_polygon([p1, p2])
+        self.assertEqual(overlap, "GEOMETRYCOLLECTION EMPTY")
+
+    def test_overlap_polygons_point_overlap(self):
+        p1 = "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        overlap = overlap_polygon([p1, p2])
+        self.assertEqual(overlap, "POINT (1 1)")
+
+    def test_overlap_polygons_polygon_overlap(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        overlap = overlap_polygon([p1, p2])
+        self.assertEqual(overlap, "POLYGON ((1 2, 2 2, 2 1, 1 1, 1 2))")
+
+    def test_overlap_polygons_two_overlaps(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        p3 = "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"
+        overlap = overlap_polygon([p1, p2, p3])
+        expected = ("MULTIPOLYGON (((1 2, 2 2, 2 1, 1 1, 1 2)), "
+                    "((0 0, 0 1, 1 1, 1 0, 0 0)))")
+        self.assertEqual(expected, overlap)
+
+    def test_overlap_polygons_duplicate_overlaps(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        overlap = overlap_polygon([p1, p2, p2])
+        self.assertEqual(overlap, "POLYGON ((1 2, 2 2, 2 1, 1 1, 1 2))")
+
+    def test_overlap_polygons_bad_polygon(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        p2 = "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))"
+        overlap = overlap_polygon([p1, p2, "madeup"])
+        self.assertEqual(overlap, "")
+
+    def test_overlap_polygons_single_polygon(self):
+        p1 = "POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))"
+        overlap = overlap_polygon([p1])
+        self.assertEqual(overlap, "GEOMETRYCOLLECTION EMPTY")
