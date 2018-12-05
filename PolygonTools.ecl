@@ -15,14 +15,14 @@ EXPORT PolygonTools := MODULE
   // SHARED module_location := './polygonTools.';
   SHARED module_location := '/opt/HPCCSystems/scripts/bin/polygonTools.';
 
-  // Dataset Operations //////////////////////////////////////////////////////////////
-  // These take in a whole dataset and return a whole dataset. More basic calls for //
-  // transforms and join logic are also available.                                  //
-  //                                                                                //
-  // WARNING: Failures due to faulty polygons my cause a no return on the output    //
-  // dataset. You should check your polygons with polys_are_valid before            //
-  // any operations. Python in HPCC has a habit of failing silently.                //
-  ////////////////////////////////////////////////////////////////////////////////////
+  // Dataset Operations ///////////////////////////////////////////////////////
+  // These take in a whole dataset and return a whole dataset. More basic    //
+  // calls for transforms and join logic are also available.                 //
+  //                                                                         //
+  // WARNING: Failures due to faulty polygons my cause a no return on the    //
+  // output dataset. You should check your polygons with polys_are_valid     //
+  // before any operations. Python in HPCC has a habit of failing silently.  //
+  /////////////////////////////////////////////////////////////////////////////
 
   //wkts_are_valid
   //eg: wkts_are_valid(validIn)
@@ -74,19 +74,19 @@ EXPORT PolygonTools := MODULE
 
 
 
-	// Transform Opearations ///////////////////////////////////////////////////////////
-	// These operations can be appied as part of a transform, for example: //
-	// SELF.area := poly_area(LEFT.polygon) //
-	// This also means you could use them as part of a join condition: //
-	// poly_isin(LEFT.poly, RIGHT.poly) //
-	// but use with caution, the dataset wide operations are much more efficient. You //
-	// definately want to use other join conditions to slim down the number of python //
-	// calls you have to make. //
-	//
-	// WARNING: Failures due to faulty polygons my cause a no return on the output //
-	// dataset. You should check your polygons with polys_are_Valid before //
-	// any operations. Python in HPCC has a habit of failing silently. //
-	////////////////////////////////////////////////////////////////////////////////////
+  // Transform Operations /////////////////////////////////////////////////////
+  // These operations can be applied as part of a transform, for example:    //
+  // SELF.area := poly_area(LEFT.polygon)                                    //
+  // This also means you could use them as part of a join condition:         //
+  // poly_isin(LEFT.poly, RIGHT.poly)                                        //
+  // but use with caution, the dataset wide operations are much more         //
+  // efficient. You definitely want to use other join conditions to slim     //
+  // down the number of python calls you have to make.                       //
+  //                                                                         //
+  // WARNING: Failures due to faulty polygons my cause a no return on the    //
+  // output dataset. You should check your polygons with polys_are_valid     //
+  //before any operations. Python in HPCC has a habit of failing silently.   //
+  /////////////////////////////////////////////////////////////////////////////
 
   //wkt_isvalid
   //eg: wkt_isvalid('POLYGON((40 40, 20 45, 45 30, 40 40))')
