@@ -1,4 +1,5 @@
 from polygonTools import *
+from polygonTools import _combine_poly
 from unittest import TestCase
 from collections import namedtuple
 
@@ -128,31 +129,31 @@ class TestCombinePolygons(TestCase):
         self.valid_2 = 'POLYGON ((0 1, 0 2, 1 2, 1 1, 0 1))'
 
     def test_combine_polygons_fails_bad_p1(self):
-        res = combine_polygons(self.invalid, self.valid)
+        res = _combine_poly(self.invalid, self.valid)
         self.assertEqual("", res)
 
     def test_combine_polygons_fails_bad_p2(self):
-        res = combine_polygons(self.valid, self.invalid)
+        res = _combine_poly(self.valid, self.invalid)
         self.assertEqual("", res)
 
     def test_combine_polygons_returns_same_polygon(self):
-        res = combine_polygons(self.valid, self.valid)
+        res = _combine_poly(self.valid, self.valid)
         self.assertEqual(self.valid, res)
 
     def test_combine_polygons_fuses_correctly_polygon(self):
-        res = combine_polygons(self.valid, self.valid_2)
+        res = _combine_poly(self.valid, self.valid_2)
         expected = "POLYGON ((0 0, 0 1, 0 2, 1 2, 1 1, 1 0, 0 0))"
         self.assertEqual(expected, res)
 
     def test_combine_polygons_fuses_correctly_multipolygon(self):
         p2 = 'POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))'
-        res = combine_polygons(self.valid, p2)
+        res = _combine_poly(self.valid, p2)
         expected = ("MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)), "
                     "((1 1, 1 2, 2 2, 2 1, 1 1)))")
         self.assertEqual(expected, res)
 
     def test_combine_polygons_p1_empty(self):
-        res = combine_polygons("GEOMETRYCOLLECTION EMPTY", self.valid)
+        res = _combine_poly("GEOMETRYCOLLECTION EMPTY", self.valid)
         self.assertEqual(self.valid, res)
 
 

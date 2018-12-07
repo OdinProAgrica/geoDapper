@@ -128,7 +128,7 @@ def overlap_polygon(in_polys):
 
 
 @_fail_as("")
-def combine_polygons(poly_1, poly_2, tol=0.000001):
+def _combine_poly(poly_1, poly_2, tol=0.000001):
     p1 = _convert_wkt(poly_1)
     if not p1.is_valid:
         p1 = p1.simplify(tol)
@@ -145,7 +145,7 @@ def combine_polygons(poly_1, poly_2, tol=0.000001):
     except TopologicalError:
         p1 = p1.simplify(tol)
         p2 = p2.simplify(tol)
-        p = combine_polygons(p1, p2, tol)
+        p = _combine_poly(p1, p2, tol)
 
     if not p.is_valid:
         p = p.simplify(tol)
@@ -174,7 +174,7 @@ def poly_union(in_polys, tol=0.000001):
     """
     combined = Polygon().wkt
     for new in in_polys:
-        combined = combine_polygons(combined, new, tol)
+        combined = _combine_poly(combined, new, tol)
     return combined
   
 ###########################################################
