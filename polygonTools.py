@@ -16,6 +16,15 @@ import traceback
 
 # Internal Functions #
 def _fail_as(fail_as):
+    """
+    Decorator to use _fail_nicely in a function.
+
+    When used as a decorator, this tries to run the function but
+    returns `fail_as` if an exception is raised. This is needed as
+    HPCC does not communicate python errors back to HPCC in a
+    sensible manner.
+
+    """
     def wrapper(f):
         @wraps(f)
         def func_wrapper(*args, **kwargs):
@@ -33,6 +42,15 @@ def _convert_wkt(poly):
 
 
 def _fail_nicely(f, to_return, args, kwargs):
+    """
+    Run a function and return `to_return` in the case of an exception.
+
+    :param f: function
+    :param to_return: Object
+    :param args: args for `f`
+    :param kwargs: keyword args for `f`
+    :return:
+    """
     try:
         return f(*args, **kwargs)
     except Exception:
