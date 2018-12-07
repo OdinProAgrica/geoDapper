@@ -94,7 +94,7 @@ EXPORT PolygonTools := MODULE
 
   //poly_isin
   //eg: poly_isin('POLYGON((40 40, 20 45, 45 30, 40 40))', 'POINT(10 20)')
-  EXPORT BOOLEAN poly_isin(STRING poly1, STRING poly2) := IMPORT(python3, module_location + 'poly_isin');
+  EXPORT BOOLEAN poly_isin(STRING inner, STRING outer) := IMPORT(python3, module_location + 'poly_isin');
 
   //poly_intersect
   //eg: poly_isin('POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))')
