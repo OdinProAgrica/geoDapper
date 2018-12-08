@@ -1,8 +1,8 @@
-﻿EXPORT geoDapper := MODULE
+﻿EXPORT wally := MODULE
     IMPORT std;
 
     EXPORT Bundle := MODULE(Std.BundleBase)
-      EXPORT Name := 'geodapper';
+      EXPORT Name := 'wally';
       EXPORT Description := 'Python based polygon handling in ECL';
       EXPORT Authors := ['Rob Mansfield (rob.mansfield@proagrica.com)'];
       EXPORT License := 'https://www.gnu.org/licenses/gpl-3.0.en.html';
