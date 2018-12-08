@@ -5,250 +5,278 @@
 # https://hpccsystems.com/bb/viewtopic.php?f=41&t=1509
   
 import pyproj 
-import shapely
 from shapely import wkt, ops
-from itertools import combinations
+from shapely.errors import TopologicalError
+from shapely.geometry import Polygon
 import warnings
 import itertools
+from functools import wraps
+import traceback
 
 
-## Internal Functions ##
+# Internal Functions #
+def _fail_as(fail_as):
+    """
+    Decorator to use _fail_nicely in a function.
+
+    When used as a decorator, this tries to run the function but
+    returns `fail_as` if an exception is raised. This is needed as
+    HPCC does not communicate python errors back to HPCC in a
+    sensible manner.
+
+    """
+    def wrapper(f):
+        @wraps(f)
+        def func_wrapper(*args, **kwargs):
+            return _fail_nicely(f, fail_as, args, kwargs)
+        return func_wrapper
+    return wrapper
+
+
+# TODO test
 def _convert_wkt(poly):
-  if isinstance(poly, str):
-    return wkt.loads(poly)
-  else:
-    return poly
+    if isinstance(poly, str):
+        return wkt.loads(poly)
+    else:
+        return poly
+
+
+def _fail_nicely(f, to_return, args, kwargs):
+    """
+    Run a function and return `to_return` in the case of an exception.
+
+    :param f: function
+    :param to_return: Object
+    :param args: args for `f`
+    :param kwargs: keyword args for `f`
+    :return:
+    """
+    try:
+        return f(*args, **kwargs)
+    except Exception:
+        tb = traceback.format_exc()
+        warnings.warn(tb)
+        return to_return
+
 #########################
+# Single Line Functions #
 
 
-## Single Line Functions ##
+@_fail_as(0.0)
 def poly_area(poly):
-  try:
     poly = _convert_wkt(poly)
     return float(poly.area)
-  except shapely.errors.WKTReadingError:
-    return 0.0
 
-def wkt_isvalid(poly):  
-  try:
+
+@_fail_as(False)
+def wkt_isvalid(poly):
     poly = _convert_wkt(poly)
     return poly.is_valid
-  except shapely.errors.WKTReadingError:
-    return False
 
-    
-def poly_isin(poly1, poly2):
-  try:
-    poly1 = _convert_wkt(poly1)
-    poly2 = _convert_wkt(poly2)
-    return poly1.contains(poly2)
-  except shapely.errors.WKTReadingError:
-    return False
-  
+
+@_fail_as(False)
+def poly_isin(inner, outer):
+    inner = _convert_wkt(inner)
+    outer = _convert_wkt(outer)
+    return outer.contains(inner)
+
+
+@_fail_as(False)
 def poly_intersect(poly1, poly2):
-  try:
     poly1 = _convert_wkt(poly1)
     poly2 = _convert_wkt(poly2)
     return poly1.intersects(poly2)
-  except shapely.errors.WKTReadingError:
-    return False
-  
-  
-def project_polygon(poly, to_proj, from_proj="epsg:4326"):
-  """
-  Project from one CRS to another. Usually used to make area calcs sensible
-  """
-  try:
-    poly = _convert_wkt(poly)
-  except shapely.errors.WKTReadingError:
-    return ''    
-  
-  p1 = pyproj.Proj(init=from_proj)
-  p2 = pyproj.Proj(init=to_proj)
 
-  t = lambda x, y: pyproj.transform(p1, p2, x, y)
-  poly = ops.transform(t, poly)
+
+@_fail_as("")
+def project_polygon(poly, to_proj, from_proj="epsg:4326"):
+    """
+    Project from one CRS to another. Usually used to make area calcs sensible
+    """
+
+    poly = _convert_wkt(poly)
   
-  return str(poly)
+    p1 = pyproj.Proj(init=from_proj)
+    p2 = pyproj.Proj(init=to_proj)
+
+    def trans(x, y):
+        return pyproj.transform(p1, p2, x, y)
+
+    poly = ops.transform(trans, poly)
   
-   
+    return poly.wkt
+
+
+@_fail_as(0.0)
 def overlap_area(polys):
-  """
-  Remember to project!!!!
-  """
-  try: 
+    """
+    Remember to project!!!!
+    """
     union_poly = overlap_polygon(polys)
     return poly_area(union_poly)
-  except AttributeError:
-    return 0.0
-    
-    
-def overlap_polygon(in_polys):
-  polys = []
-  for poly in in_polys:
-    try:
-      polys.append(_convert_wkt(poly))
-    except shapely.errors.WKTReadingError:
-      warnings.warn("Dropping invalid polygon")
-      pass
-      
-  combinations = itertools.combinations(polys, 2)
-  overlaps = [a.intersection(b) for a,b in combinations]
-  
-  unioned_overlaps = poly_union(overlaps)
-  return str(unioned_overlaps)
-   
-   
-def poly_union(in_polys, tol=0.000001):
-  """
-  Union a list of polygons. Drops invalid polygons at read in
-  so CHECK THIS FIRST! `poly_isvalid` will help you here. 
 
-  Parameters
-  ----------
-  in_polys: list
-    polygons to merge in WKT format.
-  tol: float
-    tolerance to simplify polygons by in the case of an overlapping 
+
+@_fail_as("")
+def overlap_polygon(in_polys):
+    polys = (_convert_wkt(poly) for poly in in_polys)
+
+    combinations = itertools.combinations(polys, 2)
+    overlaps = [a.intersection(b) for a, b in combinations]
+  
+    unioned_overlaps = poly_union(overlaps)
+    return unioned_overlaps
+
+
+@_fail_as("")
+def _combine_poly(poly_1, poly_2, tol=0.000001):
+    p1 = _convert_wkt(poly_1)
+    if not p1.is_valid:
+        p1 = p1.simplify(tol)
+
+    p2 = _convert_wkt(poly_2)
+    if not p2.is_valid:
+        p2 = p2.simplify(tol)
+
+    assert p1.is_valid
+    assert p2.is_valid
+
+    try:
+        p = p1.union(p2)
+    except TopologicalError:
+        p1 = p1.simplify(tol)
+        p2 = p2.simplify(tol)
+        p = _combine_poly(p1, p2, tol)
+
+    if not p.is_valid:
+        p = p.simplify(tol)
+    assert p.is_valid
+    return p.wkt
+
+
+@_fail_as("")
+def poly_union(in_polys, tol=0.000001):
+    """
+    Union a list of polygons. Drops invalid polygons at read in
+    so CHECK THIS FIRST! `poly_isvalid` will help you here.
+
+    Parameters
+    ----------
+    in_polys: list
+        polygons to merge in WKT format.
+    tol: float
+    tolerance to simplify polygons by in the case of an overlapping
     merge.
 
-  Returns
-  -------
-  type: string
-    String of the resulting WKT.
-  """
-  combined = shapely.geometry.Polygon()   
-  polys = []
-  for poly in in_polys:
-    try:
-      polys.append(_convert_wkt(poly))
-    except shapely.errors.WKTReadingError:
-      warnings.warn("Dropping invalid polygon")
-      pass
-  
-  for new in polys:
-  # first check the new one is valid
-    if not new.is_valid:
-      warnings.warn("{} is not a valid polygon".format(new.wkt))
-      continue
-    try:
-      combined = combined.union(new)
-    except shapely.errors.TopologicalError as e:
-      warnings.warn("TopologicalError was raised, trying to simplify both polygons.")
-      combined = combined.simplify(tol)
-      new = new.simplify(tol)
-      combined = combined.union(new)
-    except Exception as e:
-      warnings.warn("combining {} and {} failed".format(combined.wkt, new.wkt))
-      return ""
-              
-    if not combined.is_valid:
-      # then check the one we make is valid
-      warnings.warn("An invalid polygon was created. Simplification has taken place.")
-      combined = combined.simplify(tol)
-  return str(combined)
+    Returns
+    -------
+    type: string
+        String of the resulting WKT.
+    """
+    combined = Polygon().wkt
+    for new in in_polys:
+        combined = _combine_poly(combined, new, tol)
+    return combined
   
 ###########################################################
 
+# Dataset Wide Functions #
 
 
-## Dataset Wide Functions ##
-  
 def wkts_are_valid(recs):
-  """
-  Ensures your WKTs are valid 
+    """
+    Ensures your WKTs are valid
   
-  Takes an ECL dataset {STRING uid; STRING polygon;}
-  Returns an ECL dataset {STRING uid; BOOLEAN is_valid;}
-  """
-  for rec in recs:  
-    yield (rec.uid, wkt_isvalid(rec.polygon))
-        
-        
+    Takes an ECL dataset {STRING uid; STRING polygon;}
+    Returns an ECL dataset {STRING uid; BOOLEAN is_valid;}
+    """
+    for rec in recs:
+        yield (rec.uid, wkt_isvalid(rec.polygon))
+
+
 def polys_area(recs):  
-  """
-  Failures will not be returned. Test with polys_is_valid
-  first! 
+    """
+    Failures will not be returned. Test with polys_is_valid
+    first!
   
-  Takes an ECL dataset {STRING uid; STRING polygon;}
-  Returns an ECL dataset {STRING uid; REAL area;}
-  """
-  for rec in recs:
-    yield (rec.uid, poly_area(rec.polygon))
+    Takes an ECL dataset {STRING uid; STRING polygon;}
+    Returns an ECL dataset {STRING uid; REAL area;}
+    """
+    for rec in recs:
+        yield (rec.uid, poly_area(rec.polygon))
  
 
 def polys_arein(recs):
-  """
-  Failures will not be returned. Test with polys_are_valid
-  first! 
+    """
+    Failures will not be returned. Test with polys_are_valid
+    first!
 
-  Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
-  Returns an ECL dataset {STRING uid; BOOLEAN is_in;}
-  """
-  for rec in recs:
-    yield (rec.uid, poly_isin(rec.polygon, rec.polygon2))
-   
-   
-def polys_union(recs, tol = 0.000001):      
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
+    Returns an ECL dataset {STRING uid; BOOLEAN is_in;}
+    """
+    for rec in recs:
+        yield (rec.uid, poly_isin(rec.polygon, rec.polygon2))
+
+
+def polys_union(recs, tol=0.000001):
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
-  Returns an ECL dataset {STRING uid; STRING polygon;}
-  """
+    Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
+    Returns an ECL dataset {STRING uid; STRING polygon;}
+    """
   
-  for rec in recs:
-    yield (rec.uid, poly_union(rec.polygons, tol))
-    
-   
+    for rec in recs:
+        yield (rec.uid, poly_union(rec.polygons, tol))
+
+
 def overlap_areas(recs):      
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
-  Returns an ECL dataset {STRING uid; REAL overlap;}
-  """
+    Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
+    Returns an ECL dataset {STRING uid; REAL overlap;}
+    """
   
-  for rec in recs:
-    yield (rec.uid, overlap_area(rec.polygons))
-    
-    
+    for rec in recs:
+        yield (rec.uid, overlap_area(rec.polygons))
+
+
 def overlap_polygons(recs):      
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
-  Returns an ECL dataset {STRING uid; STRING polygon;}
-  """
+    Takes an ECL dataset {STRING uid; SET OF STRING polygons;}
+    Returns an ECL dataset {STRING uid; STRING polygon;}
+    """
   
-  for rec in recs:
-    yield (rec.uid, overlap_polygon(rec.polygons))    
-    
-    
+    for rec in recs:
+        yield (rec.uid, overlap_polygon(rec.polygons))
+
+
 def polys_intersect(recs):
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
-  Returns an ECL dataset {STRING uid; BOOLEAN intersects;}
-  """
-  for rec in recs:
-    yield(rec.uid, poly_intersect(rec.polygon, rec.polygon2))
-    
-    
+    Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
+    Returns an ECL dataset {STRING uid; BOOLEAN intersects;}
+    """
+    for rec in recs:
+        yield(rec.uid, poly_intersect(rec.polygon, rec.polygon2))
+
+
 def project_polygons(recs, to_proj, from_proj="epsg:4326"):      
-  """
-  Failures will be silently dropped from the merge. Test 
-  with polys_is_valid first! 
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first!
   
-  Takes an ECL dataset {STRING uid; STRING polygon;}
-  Returns an ECL dataset {STRING uid; STRING polygon;}
-  """
+    Takes an ECL dataset {STRING uid; STRING polygon;}
+    Returns an ECL dataset {STRING uid; STRING polygon;}
+    """
   
-  for rec in recs:
-    yield (rec.uid, project_polygon(rec.polygon, to_proj, from_proj))
+    for rec in recs:
+        yield (rec.uid, project_polygon(rec.polygon, to_proj, from_proj))
 ###########################################################
