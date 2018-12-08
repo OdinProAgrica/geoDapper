@@ -9,7 +9,7 @@
       EXPORT Copyright := 'Copyright (C) 2018 Proagrica';
       EXPORT DependsOn := [];
       EXPORT Version := '0.1.0';
-      EXPORT PlatformVersion := '6.4.24-1';
+      EXPORT PlatformVersion := '6.4.2';
     END;
     
     EXPORT polygontools := $.polygontools;
