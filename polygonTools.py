@@ -172,6 +172,9 @@ def poly_union(in_polys, tol=0.000001):
     type: string
         String of the resulting WKT.
     """
+    if len(polys == 1):
+        return polys[0]
+        
     combined = Polygon().wkt
     for new in in_polys:
         combined = _combine_poly(combined, new, tol)
