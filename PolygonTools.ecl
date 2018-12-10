@@ -138,6 +138,34 @@ EXPORT PolygonTools := MODULE
   //eg: poly_centroid('POLYGON((40 40, 20 45, 45 30, 40 40))')
   EXPORT STRING poly_centroid(STRING poly_in) := IMPORT(python3, module_location + 'poly_centroid');
   
+  
+  // Support Operations /////////////////////////////////////////////////////
+  // These operations can help your wally workflow by assisting in common    //
+  // operations                                                              //
+  /////////////////////////////////////////////////////////////////////////////  
+  
+    EXPORT polyRollup(inDS, uidcol, polycol, SortAndDist=TRUE) := FUNCTIONMACRO
+      //Takse a ds with a polygon column that is assumed to be a STRING
+      //Will rollup based on the UID column and place the polygons in 
+      //a set of strings, overwriting the polycol given. 
+      
+      LOCAL distDS := IF(SortAndDist, SORT(DISTRIBUTE(inDS, HASH(uidcol)), uidcol, LOCAL), inDS);
+      LOCAL addSets := 
+        PROJECT(distDS, 
+                TRANSFORM({RECORDOF(LEFT) AND NOT [polycol]; SET OF STRING polycol;},
+                         SELF.polycol := [LEFT.polycol];
+                         SELF := LEFT;));
+    
+      LOCAL stackedPolys := 
+        ROLLUP(addSets, 
+              LEFT.uidcol = RIGHT.uidcol, 
+              TRANSFORM(RECORDOF(addSets),
+                        SELF.polycol := LEFT.polycol + RIGHT.polycol;        
+                        SELF := RIGHT;));
+                        
+      RETURN stackedPolys;
+    ENDMACRO;         
+    
 END;
 
 
