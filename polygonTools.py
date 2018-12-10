@@ -295,7 +295,7 @@ def bounds_of_polys(recs):
     but that is sufficient.
   
     Takes an ECL dataset {STRING uid; STRING polygon;}
-    Returns an ECL dataset {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min}
+    Returns an ECL dataset {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min;}
     """
 
     for rec in recs:
