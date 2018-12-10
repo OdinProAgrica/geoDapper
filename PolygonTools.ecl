@@ -72,7 +72,11 @@ EXPORT PolygonTools := MODULE
   EXPORT projectOutRec := {STRING uid; STRING polygon;};
   EXPORT DATASET(projectOutRec) project_polygons(DATASET(projectInRec) recs, STRING to_proj, STRING from_proj='epsg:4326') := IMPORT(python3, module_location + 'project_polygons');
 
-
+  //bounds_of_polys  //TODO: TEST
+  //eg: bounds_of_polys(boundsIn)
+  EXPORT boundsInRec := {STRING uid; STRING polygon;};
+  EXPORT boundsOutRec := {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min;};
+  EXPORT DATASET(boundsOutRec) bounds_of_polys(DATASET(boundsInRec) recs) := IMPORT(python3, module_location + 'bounds_of_polys');
 
   // Transform Operations /////////////////////////////////////////////////////
   // These operations can be applied as part of a transform, for example:    //
@@ -120,6 +124,9 @@ EXPORT PolygonTools := MODULE
   //eg: poly_union(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))'])
   EXPORT STRING poly_union(SET OF STRING in_polys, REAL tol=0.000001) := IMPORT(python3, module_location + 'poly_union');
 
+  //poly_bounds  //TODO: TEST
+  //eg: poly_bounds('POLYGON((40 40, 20 45, 45 30, 40 40))')
+  EXPORT SET OF REAL poly_bounds(STRING poly_in) := IMPORT(python3, module_location + 'poly_bounds');
 END;
 
 
