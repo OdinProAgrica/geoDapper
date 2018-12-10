@@ -91,6 +91,13 @@ def poly_intersect(poly1, poly2):
 def poly_bounds(poly):
     poly = _convert_wkt(poly)
     return poly.bounds
+    
+    
+@_fail_as('')
+def poly_centroid(poly):
+    poly = _convert_wkt(poly)
+    return poly.centroid.wkt
+    
 
 
 @_fail_as("")
@@ -301,6 +308,20 @@ def bounds_of_polys(recs):
     for rec in recs:
         boundbox = poly_bounds(rec.polygon)
         yield (rec.uid, boundbox[0], boundbox[1], boundbox[2], boundbox[3])
+        
+        
+def polys_centroids(recs):
+    """
+    Failures will be silently dropped from the merge. Test
+    with polys_is_valid first! 
+  
+    Takes an ECL dataset {STRING uid; STRING polygon;}
+    Returns an ECL dataset {STRING uid; STRING centroid;}
+    """
+
+    for rec in recs:
+        yield (rec.uid, poly_centroid(poly))        
+        
         
 
 ###########################################################

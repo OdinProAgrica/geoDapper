@@ -77,6 +77,12 @@ EXPORT PolygonTools := MODULE
   EXPORT boundsInRec := {STRING uid; STRING polygon;};
   EXPORT boundsOutRec := {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min;};
   EXPORT DATASET(boundsOutRec) bounds_of_polys(DATASET(boundsInRec) recs) := IMPORT(python3, module_location + 'bounds_of_polys');
+  
+  //bounds_of_polys  //TODO: TEST
+  //eg: bounds_of_polys(boundsIn)
+  EXPORT boundsInRec := {STRING uid; STRING polygon;};
+  EXPORT boundsOutRec := {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min;};
+  EXPORT DATASET(boundsOutRec) bounds_of_polys(DATASET(boundsInRec) recs) := IMPORT(python3, module_location + 'bounds_of_polys');  
 
   // Transform Operations /////////////////////////////////////////////////////
   // These operations can be applied as part of a transform, for example:    //
@@ -127,6 +133,11 @@ EXPORT PolygonTools := MODULE
   //poly_bounds  //TODO: TEST
   //eg: poly_bounds('POLYGON((40 40, 20 45, 45 30, 40 40))')
   EXPORT SET OF REAL poly_bounds(STRING poly_in) := IMPORT(python3, module_location + 'poly_bounds');
+  
+  //poly_centroid  //TODO: TEST
+  //eg: poly_centroid('POLYGON((40 40, 20 45, 45 30, 40 40))')
+  EXPORT STRING poly_centroid(STRING poly_in) := IMPORT(python3, module_location + 'poly_centroid');
+  
 END;
 
 
