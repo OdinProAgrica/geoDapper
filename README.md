@@ -1,4 +1,7 @@
 # wally
+
+![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/geodapperLogo.png)
+
 Polygon handling tools for ECL!
 
 This project is still under development. It implements Python's Shapely 
@@ -16,8 +19,6 @@ Contributions welcome.
   * [Dataset calculations](#dataset-calculations)
   * [Support Operations](#support-operations)
 - [Beware the Gruffalo (Common Errors)](#beware-the-gruffalo-common-errors)
-
-![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/geowallyLogo.png)
 
 ## Documentation
 The package's github is available at: https://github.com/OdinProAgrica/wally
