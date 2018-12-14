@@ -79,7 +79,7 @@ EXPORT PolygonTools := MODULE
   EXPORT DATASET(cornerOutRec) polys_corners(DATASET(cornerInRec) recs) := IMPORT(python3, module_location + 'polys_corners');
   
   //polys_centroids  //TODO: TEST
-  //eg: polys_centroids(boundsIn)
+  //eg: polys_centroids(centroidIn)
   EXPORT centroidInRec := {STRING uid; STRING polygon;};
   EXPORT centroidOutRec := {STRING uid; STRING centroid;};
   EXPORT DATASET(centroidOutRec) polys_centroids(DATASET(centroidInRec) recs) := IMPORT(python3, module_location + 'polys_centroids');  

@@ -87,10 +87,10 @@ def poly_intersect(poly1, poly2):
     poly2 = _convert_wkt(poly2)
     return poly1.intersects(poly2)
     
-@_fail_as(())
+@_fail_as([])
 def poly_corners(poly):
     poly = _convert_wkt(poly)
-    return poly.bounds
+    return list(poly.bounds)
     
     
 @_fail_as('')
@@ -295,20 +295,25 @@ def project_polygons(recs, to_proj, from_proj="epsg:4326"):
     for rec in recs:
         yield (rec.uid, project_polygon(rec.polygon, to_proj, from_proj))
         
+        
 def polys_corners(recs):
     """
     Failures will be silently dropped from the merge. Test
     with polys_is_valid first! Returns Corners, not whole box
     but that is sufficient.
-  
+
     Takes an ECL dataset {STRING uid; STRING polygon;}
     Returns an ECL dataset {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min;}
     """
 
     for rec in recs:
         boundbox = poly_corners(rec.polygon)
-        yield (rec.uid, boundbox[0], boundbox[1], boundbox[2], boundbox[3])
-        
+
+        try:
+            yield (rec.uid, boundbox[0], boundbox[1], boundbox[2], boundbox[3])
+        except IndexError:
+            yield (rec.uid, 0.0, 0.0, 0.0, 0.0)
+
         
 def polys_centroids(recs):
     """
@@ -320,7 +325,7 @@ def polys_centroids(recs):
     """
 
     for rec in recs:
-        yield (rec.uid, poly_centroid(poly))        
+        yield (rec.uid, poly_centroid(rec.polygon))        
         
         
 

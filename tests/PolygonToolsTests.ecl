@@ -14,6 +14,8 @@ pt.poly_area('POLYGON((40 40, 20 45, 45 30, 40 40))');
 pt.overlap_area(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);
 pt.overlap_polygon(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);
 pt.poly_union(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);
+pt.poly_corners('POLYGON((40 40, 20 45, 45 30, 40 40))');
+pt.poly_centroid('POLYGON((40 40, 20 45, 45 30, 40 40))');
 
 geoSet := DATASET([{'a', 'POLYGON((40 40, 20 45, 45 30, 40 40))', 'POINT(35 39)'},
                     {'a', 'POLYGON((50 50, 30 55, 55 40, 50 50))', 'POINT(30 30)'},
@@ -29,6 +31,8 @@ pt.polys_area(tt.select(geoSet, 'uid, polygon'));
 pt.polys_arein(tt.select(geoSet, 'uid, polygon, polygon2'));
 pt.project_polygons(tt.select(geoSet, 'uid, polygon'), 'epsg:4326');
 pt.polys_intersect(tt.select(geoSet, 'uid, polygon, polygon2'));
+pt.polys_corners(tt.select(geoSet, 'uid, polygon'));
+pt.polys_centroids(tt.select(geoSet, 'uid, polygon'));
 
 // tests for SET OF STRINGS in DATASETS  
 addSet := PROJECT(geoSet, TRANSFORM({STRING uid; STRING polygon; SET OF STRING polygons;}, SELF.polygons := [LEFT.polygon]; SELF := LEFT;));
@@ -39,7 +43,7 @@ mergedData := tt.select(stackedPolys, 'uid, polygons');
 pt.polys_union(mergedData);
 pt.overlap_areas(mergedData);
 pt.overlap_polygons(mergedData);
-
+    
 
 
   
