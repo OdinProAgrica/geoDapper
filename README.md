@@ -90,54 +90,54 @@ Example workflows for key functionality are available in the wally compass:
 ![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/polygontools/DataSetCompass.PNG)
 
 #### wkts_are_valid
-In Record  {STRING uid; STRING polygon;};
-Out Record {STRING uid; BOOLEAN is_valid;};
-`wkts_are_valid(inDS);`
+In Record  {STRING uid; STRING polygon;};  
+Out Record {STRING uid; BOOLEAN is_valid;};  
+`wkts_are_valid(inDS);`  
 
 #### polys_area
-In Record  {STRING uid; STRING polygon;};
-Out Record {STRING uid; REAL area;};
-`polys_area(inDS);`
+In Record  {STRING uid; STRING polygon;};  
+Out Record {STRING uid; REAL area;};  
+`polys_area(inDS);`  
 
 #### polys_arein - is one point/line/polygon within a polygon?
-In Record  {STRING uid; STRING polygon; STRING polygon2;};
-Out Record {STRING uid; BOOLEAN is_in;};
-`polys_arein(inDS);`
+In Record  {STRING uid; STRING polygon; STRING polygon2;};  
+Out Record {STRING uid; BOOLEAN is_in;};  
+`polys_arein(inDS);`  
 
 #### polys_union
-In Record {STRING uid; SET OF STRING polygons;};
-Out Record {STRING uid; STRING polygon;};
-`polys_union(inDS, tol = 0.000001);`
+In Record {STRING uid; SET OF STRING polygons;};  
+Out Record {STRING uid; STRING polygon;};  
+`polys_union(inDS, tol = 0.000001);`  
 
 #### polys_intersect
-In Record {STRING uid; STRING polygon; STRING polygon2;};
-Out Record {STRING uid; BOOLEAN intersects;};
-`polys_intersect(inDS);`
+In Record {STRING uid; STRING polygon; STRING polygon2;};  
+Out Record {STRING uid; BOOLEAN intersects;};  
+`polys_intersect(inDS);`  
 
 #### overlap_areas
-In Record {STRING uid; SET OF STRING polygons;};
-Out Record {STRING uid; REAL overlap;};
-`overlap_areas(inDS);`
+In Record {STRING uid; SET OF STRING polygons;};  
+Out Record {STRING uid; REAL overlap;};  
+`overlap_areas(inDS);`  
 
 #### overlap_polygons
-In Record {STRING uid; SET OF STRING polygons;};
-Out Record {STRING uid; STRING polygon;};
-`overlap_polygons(inDS);`
+In Record {STRING uid; SET OF STRING polygons;};  
+Out Record {STRING uid; STRING polygon;};  
+`overlap_polygons(inDS);`  
 
 #### project_polygons
-In Record {STRING uid; STRING polygon;};
-Out Record {STRING uid; STRING polygon;};
-`project_polygons(inDS, 'epsg:28351', from_proj='epsg:4326');`
+In Record {STRING uid; STRING polygon;};  
+Out Record {STRING uid; STRING polygon;};  
+`project_polygons(inDS, 'epsg:28351', from_proj='epsg:4326');`  
 
 #### polys_corners
-In Record {STRING uid; STRING polygon;};
-Out Record {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min;};
+In Record {STRING uid; STRING polygon;};  
+Out Record {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min;};  
 `polys_corners(inDS);`
 
 #### polys_centroids 
-In Record  {STRING uid; STRING polygon;};
-Out Record {STRING uid; STRING centroid;};
-`polys_centroids(inDS)`
+In Record  {STRING uid; STRING polygon;};  
+Out Record {STRING uid; STRING centroid;};  
+`polys_centroids(inDS)`  
 
 ### By-value calculations
 These are singular statements such as wkt_isvalid(), poly_isin(), 
@@ -152,56 +152,56 @@ Example workflows for key functionality area available in the wally compass:
 ![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/polygontools/RawCompass.PNG)
 
 #### wkt_isvalid
-Takes: STRING
-Returns: BOOLEAN
-`wkt_isvalid('POLYGON((40 40, 20 45, 45 30, 40 40))')`
+Takes: STRING    
+Returns: BOOLEAN  
+`wkt_isvalid('POLYGON((40 40, 20 45, 45 30, 40 40))')`  
 
 #### poly_isin
-Takes: STRING inner, STRING outer
-Returns: BOOLEAN
-`poly_isin('POLYGON((40 40, 20 45, 45 30, 40 40))', 'POINT(10 20)');`
-
+Takes: STRING inner, STRING outer  
+Returns: BOOLEAN  
+`poly_isin('POLYGON((40 40, 20 45, 45 30, 40 40))', 'POINT(10 20)');`  
+ 
 #### poly_intersect
-Takes: STRING poly1, STRING poly2
-Returns: BOOLEAN
-`poly_isin('POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))');`
+Takes: STRING poly1, STRING poly2  
+Returns: BOOLEAN  
+`poly_isin('POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))');`  
 
 #### project_polygon
-Takes: STRING poly, STRING to_proj, STRING from_proj='epsg:4326'
-Returns: STRING (wkt)
-`project_polygon('POLYGON((40 40, 20 45, 45 30, 40 40))', 'epsg:28351');`
+Takes: STRING poly, STRING to_proj, STRING from_proj='epsg:4326'  
+Returns: STRING (wkt)  
+`project_polygon('POLYGON((40 40, 20 45, 45 30, 40 40))', 'epsg:28351');`  
 
 #### poly_area
-Remember to project first!!!
-Takes: STRING poly_in
-Returns: REAL
-`poly_area('POLYGON((40 40, 20 45, 45 30, 40 40))')`
+Remember to project first!!!  
+Takes: STRING poly_in  
+Returns: REAL  
+`poly_area('POLYGON((40 40, 20 45, 45 30, 40 40))')`  
 
 #### overlap_area 
-Remember to project first!!!!
-Takes: SET OF STRING polys
-Returns: REAL
-`overlap_area(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);`
+Remember to project first!!!!  
+Takes: SET OF STRING polys  
+Returns: REAL  
+`overlap_area(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);`  
 
 #### overlap_polygon
-Takes: SET OF STRING polys
-Returns: REAL
-`overlap_polygon(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);`
+Takes: SET OF STRING polys  
+Returns: REAL  
+`overlap_polygon(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);`  
 
 #### poly_union
-Takes: SET OF STRING in_polys, REAL tol=0.000001
-Returns: STRING (wkt)
-`poly_union(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);`
+Takes: SET OF STRING in_polys, REAL tol=0.000001  
+Returns: STRING (wkt)  
+`poly_union(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))']);`  
 
 #### poly_corners
-Takes: STRING poly_in
-Returns: SET OF REAL 
-`poly_corners('POLYGON((40 40, 20 45, 45 30, 40 40))');`
+Takes: STRING poly_in  
+Returns: SET OF REAL   
+`poly_corners('POLYGON((40 40, 20 45, 45 30, 40 40))');`  
 
 #### poly_centroid 
-Takes: STRING poly_in
-Returns: STRING (wkt)
-`poly_centroid('POLYGON((40 40, 20 45, 45 30, 40 40))');`
+Takes: STRING poly_in  
+Returns: STRING (wkt)  
+`poly_centroid('POLYGON((40 40, 20 45, 45 30, 40 40))');`  
 
 ### Support Operations 
 
@@ -209,9 +209,9 @@ Returns: STRING (wkt)
 This is a helper function that will take a dataset that contains polygons as strings and group them by 
 the uid column. It will then roll these up, putting all polygons that share a UID into a SET OF STRING.
 
-Takes: DATASET inDS, ECL uidcol, ECL polycol, BOOLEAN SortAndDist=TRUE
-Returns: DATASET
-`polyRollup(inDS, uidcol, polycol, SortAndDist=TRUE)`
+Takes: DATASET inDS, ECL uidcol, ECL polycol, BOOLEAN SortAndDist=TRUE  
+Returns: DATASET  
+`polyRollup(inDS, uidcol, polycol, SortAndDist=TRUE)`    
 
 ## Beware the Gruffalo (Common Errors)
 
