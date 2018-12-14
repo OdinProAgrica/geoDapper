@@ -6,6 +6,17 @@ functions to handle working with WKT polygons.
 
 Contributions welcome. 
 
+
+- [Documentation](#documentation)
+- [Installation](#installation)
+  * [ECL Code](#ecl-code)
+  * [HPCC setup](#hpcc-setup)
+  * [Python Packages and Dependencies](#python-packages-and-dependencies)
+- [How this works](#how-this-works)
+  * [Dataset calculations](#dataset-calculations)
+  * [Support Operations](#support-operations)
+- [Beware the Gruffalo (Common Errors)](#beware-the-gruffalo-common-errors)
+
 ![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/geowallyLogo.png)
 
 ## Documentation
@@ -139,7 +150,7 @@ In Record  {STRING uid; STRING polygon;};
 Out Record {STRING uid; STRING centroid;};  
 `polys_centroids(inDS)`  
 
-### By-value calculations
+### By value calculations
 These are singular statements such as wkt_isvalid(), poly_isin(), 
 poly_union(). These take single values and return single values, making them 
 useful in transforms or join conditions but also making them slower as there 
