@@ -81,10 +81,12 @@ So there are two kinds of functions in wally.polygontools:
 
 ### Dataset calculations
 These are plural statements such as wkts_arevalid(), polys_arein(), 
-polys_union(). These take whole datasets, the input and output record 
-definitions are given in the ECL script (and the python script if you want to 
-check there). In all cases they take and return a UID column so results can 
-be joined back into a master dataset.
+polys_union(). These take whole datasets so are optimised for larger 
+jobs by using Python generators. In all cases they take and 
+return a UID column so results can be joined back into a master dataset.
+
+Example workflows for key functionality are available in the wally compass: 
+
 ![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/polygontools/DataSetCompass.PNG)
 
 #### wkts_are_valid
@@ -140,8 +142,13 @@ Out Record {STRING uid; STRING centroid;};
 ### By-value calculations
 These are singular statements such as wkt_isvalid(), poly_isin(), 
 poly_union(). These take single values and return single values, making them 
-useful in transforms or join conditions (although but as much logic as 
-possible *before* the join condition to make it lighter weight!). 
+useful in transforms or join conditions but also making them slower as there 
+is less optimisation going on. If uisng for joins, do note that you should 
+have as much logic as possible *before* the join condition to make the operation
+as fast as possible! 
+
+Example workflows for key functionality area available in the wally compass:
+
 ![](https://github.com/OdinProAgrica/DocumentationImages/blob/master/polygontools/RawCompass.PNG)
 
 #### wkt_isvalid
