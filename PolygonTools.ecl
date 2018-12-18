@@ -75,7 +75,7 @@ EXPORT PolygonTools := MODULE
   //polys_corners  //TODO: TEST  
   //eg: polys_corners(boundsIn)
   EXPORT cornerInRec := {STRING uid; STRING polygon;};
-  EXPORT cornerOutRec := {STRING uid; REAL lon_min; REAL lat_max; REAL lon_max; REAL lat_min;};
+  EXPORT cornerOutRec := {STRING uid; REAL lon_min; REAL lat_min; REAL lon_max; REAL lat_max;};
   EXPORT DATASET(cornerOutRec) polys_corners(DATASET(cornerInRec) recs) := IMPORT(python3, module_location + 'polys_corners');
   
   //polys_centroids  //TODO: TEST
@@ -84,6 +84,11 @@ EXPORT PolygonTools := MODULE
   EXPORT centroidOutRec := {STRING uid; STRING centroid;};
   EXPORT DATASET(centroidOutRec) polys_centroids(DATASET(centroidInRec) recs) := IMPORT(python3, module_location + 'polys_centroids');  
 
+  //polys_simplify  //TODO: TEST
+  //eg: polys_simplify(centroidIn)
+  EXPORT simplifyInRec := {STRING uid; STRING polygon;};
+  EXPORT simplifyOutRec := {STRING uid; STRING polygon;};
+  EXPORT DATASET(simplifyOutRec) polys_simplify(DATASET(simplifyInRec) recs) := IMPORT(python3, module_location + 'polys_simplify');
   // Transform Operations /////////////////////////////////////////////////////
   // These operations can be applied as part of a transform, for example:    //
   // SELF.area := poly_area(LEFT.polygon)                                    //
@@ -137,13 +142,34 @@ EXPORT PolygonTools := MODULE
   //poly_centroid  //TODO: TEST
   //eg: poly_centroid('POLYGON((40 40, 20 45, 45 30, 40 40))')
   EXPORT STRING poly_centroid(STRING poly_in) := IMPORT(python3, module_location + 'poly_centroid');
-  
+    
+  //poly_simplify  //TODO: TEST
+  //eg: poly_simplify('POLYGON((40 40, 20 45, 45 30, 40 40))')
+  EXPORT STRING poly_simplify(STRING poly_in) := IMPORT(python3, module_location + 'poly_simplify');
   
   // Support Operations /////////////////////////////////////////////////////
   // These operations can help your wally workflow by assisting in common    //
   // operations                                                              //
   /////////////////////////////////////////////////////////////////////////////  
   
+    EXPORT CreatePolyDS(inDS, uidcol, polycol) := FUNCTIONMACRO
+      //Creates a {STRING UID; STRING Polygon;} record for use in wally's 
+						//Dataset wide functions.  To create a set for use in union functions
+						//use polyRollup after this
+						
+						//TODO: polycol2 column name, to be used for isin and
+						//intersects functions.
+
+      LOCAL tidiedDS := 
+        PROJECT(inDS, 
+                TRANSFORM({STRING uid; STRING polygon;},
+                         SELF.uid := (STRING)LEFT.uidcol;
+                         SELF.polygon := (STRING)LEFT.polycol;
+                         SELF := LEFT;));
+
+      RETURN tidiedDS;
+    ENDMACRO;         
+    
     EXPORT polyRollup(inDS, uidcol, polycol, SortAndDist=TRUE) := FUNCTIONMACRO
       //Takse a ds with a polygon column that is assumed to be a STRING
       //Will rollup based on the UID column and place the polygons in 
@@ -152,20 +178,32 @@ EXPORT PolygonTools := MODULE
       LOCAL distDS := IF(SortAndDist, SORT(DISTRIBUTE(inDS, HASH(uidcol)), uidcol, LOCAL), inDS);
       LOCAL addSets := 
         PROJECT(distDS, 
-                TRANSFORM({RECORDOF(LEFT) AND NOT [polycol]; SET OF STRING polycol;},
-                         SELF.polycol := [LEFT.polycol];
+                TRANSFORM({RECORDOF(LEFT) AND NOT [polycol]; SET OF STRING polygons;},
+                         SELF.polygons := [LEFT.polycol];
                          SELF := LEFT;));
     
       LOCAL stackedPolys := 
         ROLLUP(addSets, 
               LEFT.uidcol = RIGHT.uidcol, 
               TRANSFORM(RECORDOF(addSets),
-                        SELF.polycol := LEFT.polycol + RIGHT.polycol;        
+                        SELF.polygons := LEFT.polygons + RIGHT.polygons;        
                         SELF := RIGHT;));
                         
       RETURN stackedPolys;
-    ENDMACRO;         
-    
+    ENDMACRO; 
+		
+				// EXPORT simplifyInvalid(polyDS, validDS) := MODULE
+					
+						// LOCAL correctedPoly := JOIN(polyDS, validDS(NOT is_valid), 
+											// LEFT.uid = RIGHT.uid, 
+											// TRANSFORM(RECORDOF(LEFT), 
+																					// SELF.polygon := IF(RIGHT.uid != '', pt.poly_simplify(RIGHT.polygon);
+																					// SELF.uid := LEFT.uid;),
+										 // LEFT OUTER, SMART);
+										 
+						// RETURN (correctedPoly);
+			// ENDMACRO;    
+		
 END;
 
 
