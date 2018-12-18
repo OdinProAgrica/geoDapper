@@ -137,6 +137,13 @@ def overlap_polygon(in_polys):
   
     unioned_overlaps = poly_union(overlaps)
     return unioned_overlaps
+    
+@_fail_as("")
+def poly_simplify(in_poly, tol=0.000001):
+    poly = _convert_wkt(in_poly)
+    poly = poly.simplify(tol)
+    poly = poly if poly.is_valid else ""
+    return poly
 
 
 @_fail_as("")
@@ -184,8 +191,8 @@ def poly_union(in_polys, tol=0.000001):
     type: string
         String of the resulting WKT.
     """
-    if len(polys == 1):
-        return polys[0]
+    # if len(in_polys) == 1:
+        # return in_polys[0]
         
     combined = Polygon().wkt
     for new in in_polys:
@@ -333,6 +340,7 @@ def polys_simplify(recs, tol=0.000001):
     Failures will be returned as ''! 
   
     Takes an ECL dataset {STRING uid; STRING polygon;}
+    Returns an ECL dataset {STRING uid; STRING polygon;}
     """
 
     for rec in recs:
