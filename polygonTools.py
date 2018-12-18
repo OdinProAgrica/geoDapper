@@ -328,5 +328,14 @@ def polys_centroids(recs):
         yield (rec.uid, poly_centroid(rec.polygon))        
         
         
+def polys_simplify(recs, tol=0.000001):
+    """
+    Failures will be returned as ''! 
+  
+    Takes an ECL dataset {STRING uid; STRING polygon;}
+    """
+
+    for rec in recs:
+        yield (rec.uid, poly_simplify(rec.polygon, tol))   
 
 ###########################################################
