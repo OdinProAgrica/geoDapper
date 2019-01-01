@@ -346,9 +346,9 @@ def polys_simplify(recs, tol=0.000001):
     for rec in recs:
         yield (rec.uid, poly_simplify(rec.polygon, tol))   
 
-###########################################################
+#################################################################
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # outer = 'POLYGON((40 40, 20 40, 20 20, 40 20, 40 40))'
     # inner = 'POINT(30 30)'
     # poly_isin(inner, outer)
