@@ -128,53 +128,6 @@ result_area := pt.polys_area(tt.select(geoSet, 'uid, polygon'));
 joined_area := JOIN(result_area, area_results, LEFT.uid = RIGHT.uid AND LEFT.area = RIGHT.area, FULL ONLY);
 ASSERT(COUNT(joined_area) = 0, FAIL);
 
-//polys_arein
-are_in_input := DATASET([{'a', 'POLYGON((40 40, 20 40, 20 20, 40 20, 40 40))' , 'POLYGON((35 35, 30 35, 30 30, 35 30, 35 35))'},
-																									{'a1', 'POLYGON((35 35, 30 35, 30 30, 35 30, 35 35))', 'POLYGON((40 40, 20 40, 20 20, 40 20, 40 40))'},
-																									{'b', 'POLYGON((40 40, 20 40, 20 20, 40 20, 40 40))' , 'POINT(30 30)'},
-																									{'c', 'POLYGON((40 40, 20 40, 20 20, 40 20, 40 40))' , 'POINT(30 30)'},
-																									{'d', 'POLYGON((20 20, 10 15, 15 20, 30 30))'							 , 'POINT(30 30)'}, //Invalid
-																									{'e', 'POLYGON((30 30, 20 25, 25 30, 30 30))'						 	, 'POINT(30 30)'},
-																									{'f', 'POLYGON((20 20, 30 45, 25 30, 40 40))'							 , 'POINT(30 30)'}], //Invalid
-																									{STRING uid; STRING inner; STRING outer;});
-																																	
-result_arein := pt.polys_arein(are_in_input);
-result_arein;
-
-/* // are_in_results := DATASET([{'a', TRUE },
-   																								   // {'z', TRUE },
-   																								   // {'b', TRUE },
-   																								   // {'c', TRUE },
-   																								   // {'d', FALSE},
-   																								   // {'e', FALSE},
-   																								   // {'f', FALSE}],
-   																								   // {STRING uid; REAL is_in;});
-   // tt.head(are_in_results);
-   // tt.head(are_in_input);
-   
-   //project_polygons
-   pt.project_polygons(tt.select(geoSet, 'uid, polygon'), 'epsg:4326');
-   
-   //polys_intersect
-   pt.polys_intersect(tt.select(geoSet, 'uid, polygon, polygon2'));
-   
-   //polys_corners
-   pt.polys_corners(tt.select(geoSet, 'uid, polygon'));
-   
-   //polys_centroids
-   pt.polys_centroids(tt.select(geoSet, 'uid, polygon'));
-   
-   // tests for SET OF STRINGS in DATASETS  
-   addSet := PROJECT(geoSet, TRANSFORM({STRING uid; STRING polygon; SET OF STRING polygons;}, SELF.polygons := [LEFT.polygon]; SELF := LEFT;));
-   
-   stackedPolys := pt.polyrollup(addSet, uid, polygons);
-   mergedData := tt.select(stackedPolys, 'uid, polygons');
-                                     
-   pt.polys_union(mergedData);
-   pt.overlap_areas(mergedData);
-   pt.overlap_polygons(mergedData);
-       
-*/
 
 
   
