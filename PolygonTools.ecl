@@ -38,8 +38,8 @@ EXPORT PolygonTools := MODULE
 
   // polys_arein - is one point/line/polygon within a polygon?
   //eg: polys_arein(containsIn)
-  EXPORT containsInRec := {STRING uid; STRING polygon; STRING polygon2;};
-  EXPORT containsOutRec := {STRING uid; BOOLEAN is_in;};
+  EXPORT containsInRec  := {STRING uid; STRING inner; STRING outer;};
+	 EXPORT containsOutRec := {STRING uid; BOOLEAN is_in;};
   EXPORT DATASET(containsOutRec) polys_arein (DATASET(containsInRec) recs):= IMPORT(python3, module_location + 'polys_arein');
 
   // polys_union

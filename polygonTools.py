@@ -232,11 +232,11 @@ def polys_arein(recs):
     Failures will not be returned. Test with polys_are_valid
     first!
 
-    Takes an ECL dataset {STRING uid; STRING polygon; STRING polygon2;}
+    Takes an ECL dataset {STRING uid; STRING inner; STRING outer;}
     Returns an ECL dataset {STRING uid; BOOLEAN is_in;}
     """
     for rec in recs:
-        yield (rec.uid, poly_isin(rec.polygon, rec.polygon2))
+        yield (rec.uid, poly_isin(rec.inner, rec.outer))
 
 
 def polys_union(recs, tol=0.000001):
@@ -347,3 +347,22 @@ def polys_simplify(recs, tol=0.000001):
         yield (rec.uid, poly_simplify(rec.polygon, tol))   
 
 ###########################################################
+
+if __name__ == "__main__":
+    # outer = 'POLYGON((40 40, 20 40, 20 20, 40 20, 40 40))'
+    # inner = 'POINT(30 30)'
+    # poly_isin(inner, outer)
+        
+    # answer = poly_isin(inner, outer)    
+    # print(answer)
+    
+    # import collections
+
+    # Row = collections.namedtuple("rec", ["uid", "inner", "outer"])   
+
+    # recs = Row(uid='a', inner='POINT(30 30)', outer='POLYGON((40 40, 20 40, 20 20, 40 20, 40 40))') #Make a namedtuple from the Row class we created
+
+    # results = polys_arein([recs])
+    
+    # for result in results:
+        # print(result)
