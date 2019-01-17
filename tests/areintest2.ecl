@@ -114,7 +114,7 @@ result_are_valid := pt.wkts_are_valid(tt.select(geoSet, 'uid, polygon'));
 joined_are_valid := JOIN(result_are_valid, invalid_results, LEFT.uid = RIGHT.uid AND LEFT.is_valid = RIGHT.is_valid, FULL ONLY);
 ASSERT(COUNT(joined_are_valid) = 0, FAIL);
 
-//polys_area
+// polys_area
 area_results := DATASET([{'a', 400 },
 																								 {'a1', 25 },
 																								 {'b', 400 },
