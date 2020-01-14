@@ -23,72 +23,87 @@ EXPORT PolygonTools := MODULE
   // output dataset. You should check your polygons with polys_are_valid     //
   // before any operations. Python in HPCC has a habit of failing silently.  //
   /////////////////////////////////////////////////////////////////////////////
+	
+		//Are Valid:
+	 EXPORT wkts_arevalid(validDS, polycol) := FUNCTIONMACRO
+			LOCAL outrec := {RECORDOF(validDS); BOOLEAN valid;};
+			LOCAL outDS  := PROJECT(validDS, TRANSFORM(outrec, SELF.valid := pt.poly_isvalid(LEFT.polycol); SELF := LEFT;));							
+			RETURN outDS;
+		ENDMACRO;
+		
+		//Are in:
+	 EXPORT polys_arein(areinDS, innercol, outercol) := FUNCTIONMACRO
+			LOCAL outrec := {RECORDOF(areinDS); BOOLEAN isin;};
+			LOCAL outDS  := PROJECT(areinDS, TRANSFORM(outrec, SELF.isin := pt.poly_isin(LEFT.innercol, LEFT.outercol); SELF := LEFT;));							
+			RETURN outDS;
+		ENDMACRO;
 
-  //wkts_are_valid
-  //eg: wkts_are_valid(validIn)
-  EXPORT validInRec := {STRING uid; STRING polygon;};
-  EXPORT ValidOutRec := {STRING uid; BOOLEAN is_valid;};
-  EXPORT DATASET(ValidOutRec) wkts_are_valid(DATASET(validInRec) recs) := IMPORT(python3, module_location + 'wkts_are_valid');
+		//intersect:
+	 EXPORT polys_intersect(intersectDS, polycol1, polycol2) := FUNCTIONMACRO
+			LOCAL outrec := {RECORDOF(intersectDS); BOOLEAN intersect;};
+			LOCAL outDS  := PROJECT(intersectDS, TRANSFORM(outrec, SELF.intersect := pt.poly_intersect(LEFT.polycol1, LEFT.polycol2); SELF := LEFT;));							
+			RETURN outDS;
+		ENDMACRO;
+		
+		//project:
+	 EXPORT polys_project(projDS, polycol, to_proj, from_proj='epsg:4326') := FUNCTIONMACRO
+			LOCAL outDS  := PROJECT(projDS, TRANSFORM(RECORDOF(projDS), SELF.valid := pt.poly_project(LEFT.polycol, to_proj, from_proj); SELF := LEFT;));							
+			RETURN outDS;
+		ENDMACRO;
+				
+		//Area:
+	 EXPORT polys_area(areaDS, polycol) := FUNCTIONMACRO
+			LOCAL outrec := {RECORDOF(areaDS); REAL area;};
+			LOCAL outDS  := PROJECT(areaDS, TRANSFORM(outrec, SELF.area := pt.poly_area(LEFT.polycol); SELF := LEFT;));							
+			RETURN outDS;
+		ENDMACRO;		
+		
+		//overlap_area: NAME!!! SHOULD NOT ROIP OLD VALUES
+	 EXPORT overlap_areas(overlapAreaDS, polySetCol) := FUNCTIONMACRO
+			LOCAL outrec := {RECORDOF(overlapAreaDS); REAL overlapArea;};
+			LOCAL outDS  := PROJECT(overlapAreaDS, TRANSFORM(outrec, SELF.overlapArea := pt.overlap_area(LEFT.polySetCol); SELF := LEFT;));							
+			RETURN outDS;
+		ENDMACRO;		
 
-  //polys_area
-  //eg: polys_area(areaIn)
-  EXPORT areaInRec := {STRING uid; STRING polygon;};
-  EXPORT areaOutRec := {STRING uid; REAL area;};
-  EXPORT DATASET(areaOutRec) polys_area (DATASET(areaInRec) recs) := IMPORT(python3, module_location + 'polys_area');
-
-  // polys_arein - is one point/line/polygon within a polygon?
-  //eg: polys_arein(containsIn)
-  EXPORT containsInRec  := {STRING uid; STRING inner; STRING outer;};
-	 EXPORT containsOutRec := {STRING uid; BOOLEAN is_in;};
-  EXPORT DATASET(containsOutRec) polys_arein (DATASET(containsInRec) recs):= IMPORT(python3, module_location + 'polys_arein');
-
-  // polys_union
-  //eg: polys_union(unionIn, tol = 0.000001)
-  EXPORT unionInRec := {STRING uid; SET OF STRING polygons;};
-  EXPORT unionOutRec := {STRING uid; STRING polygon;};
-  EXPORT DATASET(unionOutRec) polys_union(DATASET(unionInRec) recs, REAL tol = 0.000001) := IMPORT(python3, module_location + 'polys_union');
-
-  //polys_intersect
-  //eg: polys_intersect(intersectIn)
-  EXPORT intersectInRec := {STRING uid; STRING polygon; STRING polygon2;};
-  EXPORT intersectOutRec := {STRING uid; BOOLEAN intersects;};
-  EXPORT DATASET(intersectOutRec) polys_intersect(DATASET(intersectInRec) recs) := IMPORT(python3, module_location + 'polys_intersect');
-
-  //overlap_areas
-  //eg: overlap_areas(overlapAreaIn)
-  EXPORT overlapAreaInRec := {STRING uid; SET OF STRING polygons;};
-  EXPORT overlapAreaOutRec := {STRING uid; REAL overlap;};
-  EXPORT DATASET(overlapAreaOutRec) overlap_areas(DATASET(overlapAreaInRec) recs) := IMPORT(python3, module_location + 'overlap_areas');
-
-  //overlap_polygons
-  //eg: overlap_polygons(overlapAreaIn)
-  EXPORT overlapPolygonInRec := {STRING uid; SET OF STRING polygons;};
-  EXPORT overlapPolygonOutRec := {STRING uid; STRING polygon;};
-  EXPORT DATASET(overlapPolygonOutRec) overlap_polygons(DATASET(overlapPolygonInRec) recs) := IMPORT(python3, module_location + 'overlap_polygons');
-
-  //project_polygons
-  //eg: project_polygons(projectIn, 'epsg:28351', from_proj='epsg:4326')
-  EXPORT projectInRec := {STRING uid; STRING polygon;};
-  EXPORT projectOutRec := {STRING uid; STRING polygon;};
-  EXPORT DATASET(projectOutRec) project_polygons(DATASET(projectInRec) recs, STRING to_proj, STRING from_proj='epsg:4326') := IMPORT(python3, module_location + 'project_polygons');
-
-  //polys_corners  //TODO: TEST  
-  //eg: polys_corners(boundsIn)
-  EXPORT cornerInRec := {STRING uid; STRING polygon;};
-  EXPORT cornerOutRec := {STRING uid; REAL lon_min; REAL lat_min; REAL lon_max; REAL lat_max;};
-  EXPORT DATASET(cornerOutRec) polys_corners(DATASET(cornerInRec) recs) := IMPORT(python3, module_location + 'polys_corners');
-  
-  //polys_centroids  //TODO: TEST
-  //eg: polys_centroids(centroidIn)
-  EXPORT centroidInRec := {STRING uid; STRING polygon;};
-  EXPORT centroidOutRec := {STRING uid; STRING centroid;};
-  EXPORT DATASET(centroidOutRec) polys_centroids(DATASET(centroidInRec) recs) := IMPORT(python3, module_location + 'polys_centroids');  
-
-  //polys_simplify  //TODO: TEST
-  //eg: polys_simplify(centroidIn)
-  EXPORT simplifyInRec := {STRING uid; STRING polygon;};
-  EXPORT simplifyOutRec := {STRING uid; STRING polygon;};
-  EXPORT DATASET(simplifyOutRec) polys_simplify(DATASET(simplifyInRec) recs) := IMPORT(python3, module_location + 'polys_simplify');
+		//overlap_polygon: SHOULD DROP OLD VALUES
+	 EXPORT overlap_polygon(overlapPolyDS, polySetCol) := FUNCTIONMACRO
+			LOCAL outrec := {RECORDOF(overlapPolyDS); STRING overlapPoly;};
+			LOCAL outDS  := PROJECT(overlapPolyDS, TRANSFORM(outrec, SELF.overlapPoly := pt.overlap_polygon(LEFT.polySetCol); SELF := LEFT;));							
+			RETURN outDS;
+		ENDMACRO;			
+		
+		//poly_union: NOTE DROPS OLD VALUES
+	 EXPORT polys_union(unionPolyDs, polySetCol) := FUNCTIONMACRO
+			LOCAL outrec := {RECORDOF(unionPolyDs) AND NOT [polySetCol]; STRING polySetCol;};
+			LOCAL outDS  := PROJECT(unionPolyDs, TRANSFORM(outrec, SELF.polySetCol := pt.overlap_polygon(LEFT.polySetCol); SELF := LEFT;));							
+			RETURN outDS;
+		ENDMACRO;			
+		
+	 //Add BBox:
+	 EXPORT polys_corners(bboxDS, polycol) := FUNCTIONMACRO
+		  
+			LOCAL outrec := RECORD
+					RECORDOF(bboxDS);
+					REAL latmin;
+					REAL latmax;
+					REAL lonmin;
+					REAL lonmax;
+			END;
+			
+			LOCAL outDS := 
+				PROJECT(bboxDS, 
+					TRANSFORM(outrec, 
+															bbox         := pt.poly_corners(LEFT.polycol);
+															SELF.latmin  := bbox[2];
+															SELF.latmax  := bbox[4];
+															SELF.lonmin  := bbox[1];
+															SELF.lonmax  := bbox[3];
+															SELF := LEFT;)
+				 );
+															
+			 RETURN outDS;
+		ENDMACRO;
+			
   // Transform Operations /////////////////////////////////////////////////////
   // These operations can be applied as part of a transform, for example:    //
   // SELF.area := poly_area(LEFT.polygon)                                    //
@@ -134,10 +149,6 @@ EXPORT PolygonTools := MODULE
   //poly_union
   //eg: poly_union(['POLYGON((40 40, 20 45, 45 30, 40 40))', 'POLYGON((50 50, 10 45, 45 30, 50 50))'])
   EXPORT STRING poly_union(SET OF STRING in_polys, REAL tol=0.000001) := IMPORT(python3, module_location + 'poly_union');
-
-  //poly_corners  //TODO: TEST
-  //eg: poly_corners('POLYGON((40 40, 20 45, 45 30, 40 40))')
-  EXPORT SET OF REAL poly_corners(STRING poly_in) := IMPORT(python3, module_location + 'poly_corners');
   
   //poly_centroid  //TODO: TEST
   //eg: poly_centroid('POLYGON((40 40, 20 45, 45 30, 40 40))')
@@ -146,29 +157,15 @@ EXPORT PolygonTools := MODULE
   //poly_simplify  //TODO: TEST
   //eg: poly_simplify('POLYGON((40 40, 20 45, 45 30, 40 40))')
   EXPORT STRING poly_simplify(STRING poly_in) := IMPORT(python3, module_location + 'poly_simplify');
+	
+  //poly_corners  //TODO: TEST
+  //eg: poly_corners('POLYGON((40 40, 20 45, 45 30, 40 40))')
+  EXPORT SET OF REAL poly_corners(STRING poly_in) := IMPORT(python3, module_location + 'poly_corners');
   
   // Support Operations /////////////////////////////////////////////////////
   // These operations can help your wally workflow by assisting in common    //
   // operations                                                              //
-  /////////////////////////////////////////////////////////////////////////////  
-  
-    EXPORT CreatePolyDS(inDS, uidcol, polycol) := FUNCTIONMACRO
-      //Creates a {STRING UID; STRING Polygon;} record for use in wally's 
-						//Dataset wide functions.  To create a set for use in union functions
-						//use polyRollup after this
-						
-						//TODO: polycol2 column name, to be used for isin and
-						//intersects functions.
-
-      LOCAL tidiedDS := 
-        PROJECT(inDS, 
-                TRANSFORM({STRING uid; STRING polygon;},
-                         SELF.uid := (STRING)LEFT.uidcol;
-                         SELF.polygon := (STRING)LEFT.polycol;
-                         SELF := LEFT;));
-
-      RETURN tidiedDS;
-    ENDMACRO;         
+  /////////////////////////////////////////////////////////////////////////////      
     
     EXPORT polyRollup(inDS, uidcol, polycol, SortAndDist=TRUE) := FUNCTIONMACRO
       //Takse a ds with a polygon column that is assumed to be a STRING
